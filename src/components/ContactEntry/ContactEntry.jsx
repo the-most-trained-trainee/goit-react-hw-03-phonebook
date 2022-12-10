@@ -2,19 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ContactEntryStyled from './StyledContactEntry';
 
-class ContactEntry extends React.Component {
-  render() {
-    return (
-      <ContactEntryStyled>
-        <span>{this.props.name}: </span>
-        <span>{this.props.number}</span>
-        <button onClick={() => this.props.onDelete(this.props.id)}>
-          Delete
-        </button>
-      </ContactEntryStyled>
-    );
-  }
-}
+const ContactEntry = ({ name, number, id, onDelete }) => {
+  return (
+    <ContactEntryStyled>
+      <span>{name}: </span>
+      <span>{number}</span>
+      <button onClick={() => onDelete(id)}>Delete</button>
+    </ContactEntryStyled>
+  );
+};
 
 ContactEntry.propTypes = {
   id: PropTypes.string.isRequired,

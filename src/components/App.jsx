@@ -1,27 +1,47 @@
 import React from 'react';
 import { nanoid } from 'nanoid';
-import Container from './StyledContainer';
-import ContactForm from './ContactForm';
-import ContactList from './ContactList';
+import Container from './Container/StyledContainer';
+import ContactForm from './ContactForm/ContactForm';
+import ContactList from './ContactList/ContactList';
+import Filter from './Filter/Filter';
 
 class App extends React.Component {
   state = {
-    contacts: [],
+    contacts: [{ id: 'id-4', name: 'Annie Copeland', number: '227-91-26' }],
+    filter: '',
   };
 
   componentDidMount() {
-    const localContacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(localContacts);
-    if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
+    if (localStorage.getItem('contacts')) {
+      const localContacts = JSON.parse(localStorage.getItem('contacts'));
+      this.setState({ contacts: localContacts });
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.contacts !== this.state.contacts) {
+      const localContactsStringified = JSON.stringify(this.state.contacts);
+      localStorage.setItem('contacts', localContactsStringified);
     }
   }
+
+  contactSearch = request => {
+    this.setState(prevState => {
+      return { filter: request };
+    });
+  };
+
+  getFilteredContacts = () => {
+    let result = [];
+    if (this.state.filter === '') {
+      result = this.state.contacts;
+    } else {
+      result = this.state.contacts.filter(contact =>
+        contact.name.toUpperCase().includes(this.state.filter.toUpperCase())
+      );
+    }
+    return result;
+  };
 
   contactSubmit = data => {
     this.setState(prevState => ({
@@ -45,7 +65,11 @@ class App extends React.Component {
           contacts={this.state.contacts}
         />
         <h2>Contacts</h2>
-        <ContactList onDelete={this.onDelete} contacts={this.state.contacts} />
+        <Filter onSearch={this.contactSearch} />
+        <ContactList
+          onDelete={this.onDelete}
+          contacts={this.getFilteredContacts()}
+        />
       </Container>
     );
   }
